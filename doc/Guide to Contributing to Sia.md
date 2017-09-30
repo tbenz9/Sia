@@ -248,7 +248,7 @@ tests is a good way to get your feet wet.  See [doc/Running and Writing Tests fo
 
 ## Contact us
 
-Feel free to ask for help on the #dev channel on [Slack][slack].
+Feel free to ask for help on the #core-dev channel on [Discord][Discord].
 
 [cross]: http://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5
 [binary]: https://golang.org/dl/
