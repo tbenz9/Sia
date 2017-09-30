@@ -107,5 +107,9 @@ func NewSafeFile(filename string) (*safeFile, error) {
 
 // RemoveFile deletes a file from disk
 func RemoveFile(filename string) error {
-	return os.RemoveAll(filename)
+	err := os.RemoveAll(filename)
+	if err != nil {
+		return err
+	}
+	return nil
 }
