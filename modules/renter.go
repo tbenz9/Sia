@@ -88,6 +88,7 @@ type FileInfo struct {
 	Redundancy     float64           `json:"redundancy"`
 	UploadedBytes  uint64            `json:"uploadedbytes"`
 	UploadProgress float64           `json:"uploadprogress"`
+        Created        uint64            `json:"created"`
 	Expiration     types.BlockHeight `json:"expiration"`
 }
 

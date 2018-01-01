@@ -223,6 +223,10 @@ lists the status of all files.
       // download before upload progress is 100.
       "uploadprogress": 100, // percent
 
+      // Timestamp that the file was created on the Sia network.  Uses Unix
+      // Epoch time.
+      "created": 1514780089,
+
       // Block height at which the file ceases availability.
       "expiration": 60000
     }   

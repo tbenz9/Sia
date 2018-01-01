@@ -865,6 +865,7 @@ lists the status of all files.
       "redundancy":     5,
       "bytesuploaded":  209715200, // total bytes uploaded
       "uploadprogress": 100, // percent
+      "created":        1514780089, // epoch timestamp
       "expiration":     60000
     }
   ]

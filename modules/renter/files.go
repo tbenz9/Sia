@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+        "time"
 
 	"github.com/NebulousLabs/Sia/build"
 	"github.com/NebulousLabs/Sia/crypto"
@@ -33,6 +34,7 @@ type file struct {
 	erasureCode modules.ErasureCoder // Static - can be accessed without lock.
 	pieceSize   uint64               // Static - can be accessed without lock.
 	mode        uint32               // actually an os.FileMode
+        createTime  uint64
 
 	mu sync.RWMutex
 }
@@ -183,6 +185,7 @@ func newFile(name string, code modules.ErasureCoder, pieceSize, fileSize uint64)
 		masterKey:   crypto.GenerateTwofishKey(),
 		erasureCode: code,
 		pieceSize:   pieceSize,
+                createTime:  time.Unix(),
 	}
 }
 
@@ -252,6 +255,7 @@ func (r *Renter) FileList() []modules.FileInfo {
 			Redundancy:     f.redundancy(isOffline),
 			UploadedBytes:  f.uploadedBytes(),
 			UploadProgress: f.uploadProgress(),
+                        Created:        f.createTime,
 			Expiration:     f.expiration(),
 		})
 		f.mu.RUnlock()
