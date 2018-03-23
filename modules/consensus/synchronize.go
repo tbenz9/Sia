@@ -2,6 +2,7 @@ package consensus
 
 import (
 	"errors"
+//	"fmt"
 	"net"
 	"sync"
 	"time"
@@ -25,6 +26,9 @@ var (
 	errEarlyStop         = errors.New("initial blockchain download did not complete by the time shutdown was issued")
 	errNilProcBlock      = errors.New("nil processed block was fetched from the database")
 	errSendBlocksStalled = errors.New("SendBlocks RPC timed and never received any blocks")
+	downloadTime time.Duration
+	applyTime time.Duration
+	validateTime time.Duration
 
 	// ibdLoopDelay is the time that threadedInitialBlockchainDownload waits
 	// between attempts to synchronize with the network if the last attempt
@@ -76,6 +80,15 @@ var (
 		Testing:  5 * time.Second,
 	}).(time.Duration)
 )
+
+
+func timeTrack(start time.Time, name string) {
+    elapsed := time.Since(start)
+    if name == "download" {downloadTime = downloadTime + elapsed}
+    if name == "validate" {validateTime = validateTime + elapsed}
+    if name == "apply" {applyTime = applyTime + elapsed}
+    //fmt.Printf("%f %v\n", elapsed.Seconds(), name)
+}
 
 // isTimeoutErr is a helper function that returns true if err was caused by a
 // network timeout.
@@ -207,6 +220,7 @@ func (cs *ConsensusSet) managedReceiveBlocks(conn modules.PeerConn) (returnErr e
 	// there are no more blocks available.
 	moreAvailable := true
 	for moreAvailable {
+		start := time.Now()
 		// Read a slice of blocks from the wire.
 		var newBlocks []types.Block
 		if err := encoding.ReadObject(conn, &newBlocks, uint64(MaxCatchUpBlocks)*types.BlockSizeLimit); err != nil {
@@ -219,7 +233,7 @@ func (cs *ConsensusSet) managedReceiveBlocks(conn modules.PeerConn) (returnErr e
 			continue
 		}
 		stalled = false
-
+		timeTrack(start,"download")
 		// Call managedAcceptBlock instead of AcceptBlock so as not to broadcast
 		// every block.
 		extended, acceptErr := cs.managedAcceptBlocks(newBlocks)

@@ -242,7 +242,7 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 	chainExtended := false
 	changes := make([]changeEntry, 0, len(blocks))
 	setErr := cs.db.Update(func(tx *bolt.Tx) error {
-		cs.log.Printf("accept: starting block processing loop (%v blocks, height %v)", len(blocks), blockHeight(tx))
+		//cs.log.Printf("accept: starting block processing loop (%v blocks, height %v)", len(blocks), blockHeight(tx))
 		for i := 0; i < len(blocks); i++ {
 			// Start by checking the header of the block.
 			parent, err := cs.validateHeaderAndBlock(boltTxWrapper{tx}, blocks[i], blockIDs[i])
@@ -270,7 +270,13 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 				for _, b := range changeEntry.RevertedBlocks {
 					reverted = append(reverted, b.String()[:6])
 				}
-				cs.log.Printf("accept: added change %v, applying blocks %v, reverting blocks %v (height now %v)", changeEntry.ID(), applied, reverted, blockHeight(tx))
+//				cs.log.Printf("accept: added change %v, applying blocks %v, reverting blocks %v (height now %v)", changeEntry.ID(), applied, reverted, blockHeight(tx))
+				if blockHeight(tx)%1000 == 0 { 
+					cs.log.Printf("Height %v at %v", blockHeight(tx),time.Now().Unix())
+					cs.log.Printf("Download time: %v", downloadTime.Seconds())
+					cs.log.Printf("Validate time: %v", validateTime.Seconds())
+					cs.log.Printf("Apply time: %v", applyTime.Seconds())
+				}
 			}
 			if err == modules.ErrNonExtendingBlock {
 				err = nil
@@ -286,7 +292,7 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 		}
 		return nil
 	})
-	cs.log.Printf("accept: finished block processing loop")
+	//cs.log.Printf("accept: finished block processing loop")
 	if _, ok := setErr.(bolt.MmapError); ok {
 		cs.log.Println("ERROR: Bolt mmap failed:", setErr)
 		fmt.Println("Blockchain database has run out of disk space!")
@@ -308,7 +314,7 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 	}
 	// Send any changes to subscribers.
 	for i := 0; i < len(changes); i++ {
-		cs.updateSubscribers(changes[i])
+		// cs.updateSubscribers(changes[i])
 	}
 	return chainExtended, nil
 }

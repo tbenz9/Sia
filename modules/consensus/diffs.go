@@ -2,6 +2,7 @@ package consensus
 
 import (
 	"errors"
+	"time"
 
 	"github.com/NebulousLabs/Sia/build"
 	"github.com/NebulousLabs/Sia/encoding"
@@ -217,11 +218,15 @@ func generateAndApplyDiff(tx *bolt.Tx, pb *processedBlock) error {
 	// validated all at once because some transactions may not be valid until
 	// previous transactions have been applied.
 	for _, txn := range pb.Block.Transactions {
+		start := time.Now()
 		err := validTransaction(tx, txn)
 		if err != nil {
 			return err
 		}
+		timeTrack(start,"validate")
+		start = time.Now()
 		applyTransaction(tx, pb, txn)
+		timeTrack(start,"apply")
 	}
 
 	// After all of the transactions have been applied, 'maintenance' is
