@@ -29,6 +29,7 @@ var (
 	downloadTime time.Duration
 	applyTime time.Duration
 	validateTime time.Duration
+	subsTime time.Duration
 
 	// ibdLoopDelay is the time that threadedInitialBlockchainDownload waits
 	// between attempts to synchronize with the network if the last attempt
@@ -87,7 +88,7 @@ func timeTrack(start time.Time, name string) {
     if name == "download" {downloadTime = downloadTime + elapsed}
     if name == "validate" {validateTime = validateTime + elapsed}
     if name == "apply" {applyTime = applyTime + elapsed}
-    //fmt.Printf("%f %v\n", elapsed.Seconds(), name)
+    if name == "subscribers" {subsTime = subsTime + elapsed}
 }
 
 // isTimeoutErr is a helper function that returns true if err was caused by a

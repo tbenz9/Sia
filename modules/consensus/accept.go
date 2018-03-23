@@ -276,6 +276,7 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 					cs.log.Printf("Download time: %v", downloadTime.Seconds())
 					cs.log.Printf("Validate time: %v", validateTime.Seconds())
 					cs.log.Printf("Apply time: %v", applyTime.Seconds())
+					cs.log.Printf("Subscribers time: %v", subsTime.Seconds())
 				}
 			}
 			if err == modules.ErrNonExtendingBlock {
@@ -314,7 +315,9 @@ func (cs *ConsensusSet) managedAcceptBlocks(blocks []types.Block) (blockchainExt
 	}
 	// Send any changes to subscribers.
 	for i := 0; i < len(changes); i++ {
-		// cs.updateSubscribers(changes[i])
+		start := time.Now()
+		cs.updateSubscribers(changes[i])
+		timeTrack(start, "subscribers")
 	}
 	return chainExtended, nil
 }
